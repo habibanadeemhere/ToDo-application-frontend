@@ -35,10 +35,11 @@ console.log("res-->", res);
       navigate("/dashboard");
 
     } catch (error) {
-      console.log(error);
 
-      alert("Login Failed");
-    }
+  console.log(error.response);
+
+  alert(error.response?.data?.message || "Login Failed");
+}
   };
 
   return (
