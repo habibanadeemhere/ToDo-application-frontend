@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://to-do-application-frontend-phi.vercel.app/api",
 });
 
 API.interceptors.request.use((req) => {

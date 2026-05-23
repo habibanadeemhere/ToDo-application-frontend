@@ -23,3 +23,8 @@ function App() {
 }
 
 export default App;
+
+
+// git add .
+// git commit -m "updated frontend"
+// git push
