@@ -1,18 +1,23 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://to-do-application-backend-five.vercel.app/api",
+  baseURL: "http://localhost:5000/api",
 });
 
-API.interceptors.request.use((req) => {
+API.interceptors.request.use(
+  (config) => {
 
-  const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
 
-  if (token) {
-    req.headers.Authorization = token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-
-  return req;
-});
+);
 
 export default API;
