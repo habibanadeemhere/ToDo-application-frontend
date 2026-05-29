@@ -317,7 +317,7 @@ function Dashboard() {
   // ── Socket.io ────────────────────────────────────────────────────────────────
   useEffect(() => {
     const token = localStorage.getItem("token");
-    socketRef.current = io(import.meta.env.VITE_API_URL || "http://localhost:5000", {
+    socketRef.current = io(import.meta.env.VITE_API_URL || "https://to-do-application-backend-3sjc.vercel.app/", {
       auth: { token },
       transports: ["websocket"],
     });
