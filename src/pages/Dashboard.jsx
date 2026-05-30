@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import API from "../services/api";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { io } from "socket.io-client";
 
 // ─── Edit Card ─────────────────────────────────────────────────────────────────
 const EditCard = ({ task, col, initialImagePreview, onSave, onCancel, allUsers }) => {
@@ -15,6 +14,10 @@ const EditCard = ({ task, col, initialImagePreview, onSave, onCancel, allUsers }
     dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
     priority: task.priority || "medium",
   });
+
+  const prevTasksRef = useRef([]);
+const notifiedDeadlines = useRef(new Set());
+
 
   useEffect(() => { const t = setTimeout(() => titleRef.current?.focus(), 50); return () => clearTimeout(t); }, []);
   const handleSave = () => onSave(task._id, localForm, editImage);
@@ -276,11 +279,10 @@ function Dashboard() {
   const [filterPriority, setFilterPriority] = useState("");
   const [commentTask, setCommentTask]     = useState(null);
   const [historyTask, setHistoryTask]     = useState(null);
-  const [onlineUsers, setOnlineUsers]     = useState([]);
   const fileInputRef = useRef(null);
   const notifRef     = useRef(null);
   const activityRef  = useRef(null);
-  const socketRef    = useRef(null);
+  const prevTasksRef = useRef([]);
 
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const isAdmin = currentUser.role === "admin";
@@ -314,82 +316,135 @@ function Dashboard() {
     try { const res = await API.get("/auth/users"); setAllUsers(res.data || []); } catch {}
   }, []);
 
-  // ── Socket.io ────────────────────────────────────────────────────────────────
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    socketRef.current = io(import.meta.env.VITE_API_URL || "https://to-do-application-backend-3sjc.vercel.app/", {
-      auth: { token },
-      transports: ["websocket"],
-    });
+  // ── Polling — replaces Socket.io (Vercel serverless = no WebSockets) ─────────
+  // Silently fetches every 4s, diffs against previous state, notifies on changes.
+ useEffect(() => {
+  const myId = String(currentUser._id || currentUser.id || "");
 
-    const s = socketRef.current;
+  const poll = async () => {
+    try {
+      const res = await API.get("/tasks");
+      const fresh = res.data.tasks || res.data;
+      const prev = prevTasksRef.current;
 
-    s.emit("userOnline", { userId: currentUser._id, name: currentUser.name });
+      fresh.forEach((t) => {
+        const creatorId = String(
+          typeof t.user === "object" ? t.user?._id : t.user
+        );
 
-    s.on("onlineUsers", (users) => setOnlineUsers(users));
+        const existed = prev.find((p) => p._id === t._id);
 
-    s.on("taskCreated", (task) => {
-      setTasks(prev => {
-        if (prev.find(t => t._id === task._id)) return prev;
-        return [task, ...prev];
+        // New task by someone else
+        if (!existed && creatorId !== myId) {
+          addToast(`📌 ${t.user?.name || "Someone"} created "${t.title}"`);
+          logActivity(
+            `${t.user?.name || "Someone"} created "${t.title}"`
+          );
+        }
+
+        // Status changed by someone else
+        if (
+          existed &&
+          existed.status !== t.status &&
+          creatorId !== myId
+        ) {
+          addToast(`🔄 "${t.title}" moved to ${t.status}`);
+        }
+
+        // New comment by someone else
+        const oldCount = existed?.comments?.length || 0;
+        const freshCount = t.comments?.length || 0;
+
+        if (freshCount > oldCount) {
+          const latest = t.comments?.[t.comments.length - 1];
+
+          const commenterId = String(
+            typeof latest?.user === "object"
+              ? latest?.user?._id
+              : latest?.user
+          );
+
+          if (commenterId !== myId) {
+            addToast(`💬 New comment on "${t.title}"`);
+          }
+        }
       });
-      if (String(task.user?._id || task.user) !== String(currentUser._id || currentUser.id)) {
-        addToast(`📌 ${task.user?.name || "Someone"} created "${task.title}"`);
-        logActivity(`${task.user?.name || "Someone"} created "${task.title}"`);
-      }
-    });
 
-    s.on("taskUpdated", (task) => {
-      setTasks(prev => prev.map(t => t._id === task._id ? task : t));
-      if (String(task.user?._id || task.user) !== String(currentUser._id || currentUser.id)) {
-        addToast(`✏️ "${task.title}" was updated`);
-      }
-    });
-
-    s.on("taskDeleted", (id) => {
-      setTasks(prev => prev.filter(t => t._id !== id));
-    });
-
-    s.on("taskCommented", ({ taskId, comment }) => {
-      setTasks(prev => prev.map(t => t._id === taskId ? { ...t, comments: [...(t.comments || []), comment] } : t));
-      if (String(comment.user?._id || comment.user) !== String(currentUser._id || currentUser.id)) {
-        addToast(`💬 New comment on a task`);
-      }
-    });
-
-    s.on("assignedToYou", (task) => {
-      addToast(`🎯 You were assigned to "${task.title}"`, "success");
-      logActivity(`You were assigned to "${task.title}"`);
-    });
-
-    return () => s.disconnect();
-  }, []);
-
-  // ── Deadline reminder interval ───────────────────────────────────────────────
-  useEffect(() => {
-    const interval = setInterval(() => {
+      // Deadline notifications
       const now = new Date();
-      tasks.forEach(task => {
-        if (!task.dueDate || task.status === "done") return;
-        const diff = (new Date(task.dueDate) - now) / (1000 * 60 * 60);
-        if (diff > 0 && diff < 24) addToast(`⏰ "${task.title}" due in < 24h`, "success");
-        if (diff < 0) addToast(`⚠ "${task.title}" is overdue!`, "error");
+
+      fresh.forEach((t) => {
+        if (!t.dueDate || t.status === "done") return;
+
+        const diff =
+          (new Date(t.dueDate) - now) / (1000 * 60 * 60);
+
+        if (
+          diff > 0 &&
+          diff <= 24 &&
+          !notifiedDeadlines.current.has(`due-${t._id}`)
+        ) {
+          addToast(`⏰ "${t.title}" due in < 24h`);
+          notifiedDeadlines.current.add(`due-${t._id}`);
+        }
+
+        if (
+          diff < 0 &&
+          !notifiedDeadlines.current.has(`overdue-${t._id}`)
+        ) {
+          addToast(`⚠ "${t.title}" is overdue!`, "error");
+          notifiedDeadlines.current.add(`overdue-${t._id}`);
+        }
       });
-    }, 60 * 60 * 1000); // every hour
-    return () => clearInterval(interval);
-  }, [tasks]);
 
-  useEffect(() => { refreshTasks(); fetchUsers(); }, []);
+      prevTasksRef.current = fresh;
+      setTasks(fresh);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  // close panels on outside click
-  useEffect(() => {
-    const h = (e) => {
-      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifs(false);
-      if (activityRef.current && !activityRef.current.contains(e.target)) setShowActivity(false);
-    };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, []);
+  poll();
+  const interval = setInterval(poll, 4000);
+
+  return () => clearInterval(interval);
+}, []);
+
+// ───────────────── Initial Load ─────────────────
+useEffect(() => {
+  refreshTasks();
+  fetchUsers();
+}, []);
+
+// ───────────────── Update Previous Tasks Ref ─────────────────
+useEffect(() => {
+  prevTasksRef.current = tasks;
+}, [tasks]);
+
+// ───────────────── Close Panels on Outside Click ─────────────────
+useEffect(() => {
+  const h = (e) => {
+    if (
+      notifRef.current &&
+      !notifRef.current.contains(e.target)
+    ) {
+      setShowNotifs(false);
+    }
+
+    if (
+      activityRef.current &&
+      !activityRef.current.contains(e.target)
+    ) {
+      setShowActivity(false);
+    }
+  };
+
+  document.addEventListener("mousedown", h);
+
+  return () => {
+    document.removeEventListener("mousedown", h);
+  };
+}, []);
 
   // ── CRUD ─────────────────────────────────────────────────────────────────────
   const createTask = async (e) => {
@@ -614,13 +669,6 @@ function Dashboard() {
           </div>
 
           <div className="nav-right">
-            {/* online users indicator */}
-            {onlineUsers.length > 0 && (
-              <div className="online-pill" title={onlineUsers.map(u => u.name).join(", ")}>
-                <div className="online-dot" />
-                <span style={{ fontSize: "11px", color: "#3fb950", fontWeight: "600" }}>{onlineUsers.length} online</span>
-              </div>
-            )}
 
             {/* activity */}
             <div className="activity-wrap" ref={activityRef}>
