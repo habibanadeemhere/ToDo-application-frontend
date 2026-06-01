@@ -254,22 +254,6 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
 };
 
 
-const uploadToCloudinary = async (file) => {
-  const data = new FormData();
-  data.append("file", file);
-  data.append("upload_preset", "YOUR_UPLOAD_PRESET"); // 👈 change this
-
-  const res = await fetch(
-    "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
-    {
-      method: "POST",
-      body: data,
-    }
-  );
-
-  const json = await res.json();
-  return json.secure_url;
-};
 
 // ─── Main Dashboard ──────────────────────────────────────────────────────────────
 function Dashboard() {
@@ -465,26 +449,23 @@ useEffect(() => {
 }, []);
 
   // ── CRUD ─────────────────────────────────────────────────────────────────────
- const createTask = async (e) => {
+const createTask = async (e) => {
   e.preventDefault();
   setIsAdding(true);
 
   try {
-    let imageUrl = null;
+    const fd = new FormData();
 
-    if (taskImage) {
-      imageUrl = await uploadToCloudinary(taskImage);
-    }
+    fd.append("title", title);
+    fd.append("description", description);
+    fd.append("status", status);
+    fd.append("priority", priority);
 
-    await API.post("/tasks", {
-      title,
-      description,
-      status,
-      priority,
-      dueDate,
-      assignedTo,
-      image: imageUrl,
-    });
+    if (dueDate) fd.append("dueDate", dueDate);
+    if (assignedTo) fd.append("assignedTo", assignedTo);
+    if (taskImage) fd.append("image", taskImage);
+
+    await API.post("/tasks", fd);
 
     setTitle("");
     setDescription("");
