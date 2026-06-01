@@ -457,6 +457,11 @@ useEffect(() => {
       if (dueDate) fd.append("dueDate", dueDate);
       if (assignedTo) fd.append("assignedTo", assignedTo);
       if (taskImage) fd.append("image", taskImage);
+
+      for (let pair of fd.entries()) {
+  console.log(pair[0], pair[1]);
+}
+
       await API.post("/tasks", fd);
       setTitle(""); setDescription(""); setStatus("todo"); setPriority("medium");
       setDueDate(""); setAssignedTo(""); setTaskImage(null); setTaskImagePreview(null);
