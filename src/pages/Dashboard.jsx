@@ -253,6 +253,24 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
   );
 };
 
+
+const uploadToCloudinary = async (file) => {
+  const data = new FormData();
+  data.append("file", file);
+  data.append("upload_preset", "YOUR_UPLOAD_PRESET"); // 👈 change this
+
+  const res = await fetch(
+    "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload",
+    {
+      method: "POST",
+      body: data,
+    }
+  );
+
+  const json = await res.json();
+  return json.secure_url;
+};
+
 // ─── Main Dashboard ──────────────────────────────────────────────────────────────
 function Dashboard() {
   const [tasks, setTasks]                 = useState([]);
@@ -447,29 +465,50 @@ useEffect(() => {
 }, []);
 
   // ── CRUD ─────────────────────────────────────────────────────────────────────
-  const createTask = async (e) => {
-    e.preventDefault();
-    setIsAdding(true);
-    try {
-      const fd = new FormData();
-      fd.append("title", title); fd.append("description", description);
-      fd.append("status", status); fd.append("priority", priority);
-      if (dueDate) fd.append("dueDate", dueDate);
-      if (assignedTo) fd.append("assignedTo", assignedTo);
-      if (taskImage) fd.append("image", taskImage);
+ const createTask = async (e) => {
+  e.preventDefault();
+  setIsAdding(true);
 
-      for (let pair of fd.entries()) {
-  console.log(pair[0], pair[1]);
-}
+  try {
+    let imageUrl = null;
 
-      await API.post("/tasks", fd);
-      setTitle(""); setDescription(""); setStatus("todo"); setPriority("medium");
-      setDueDate(""); setAssignedTo(""); setTaskImage(null); setTaskImagePreview(null);
-      setShowAddForm(false);
-      await refreshTasks();
-      addToast("✅ Task created!"); logActivity(`Created task "${title}"`);
-    } catch { addToast("❌ Failed to create task", "error"); } finally { setIsAdding(false); }
-  };
+    if (taskImage) {
+      imageUrl = await uploadToCloudinary(taskImage);
+    }
+
+    await API.post("/tasks", {
+      title,
+      description,
+      status,
+      priority,
+      dueDate,
+      assignedTo,
+      image: imageUrl,
+    });
+
+    setTitle("");
+    setDescription("");
+    setStatus("todo");
+    setPriority("medium");
+    setDueDate("");
+    setAssignedTo("");
+    setTaskImage(null);
+    setTaskImagePreview(null);
+
+    setShowAddForm(false);
+
+    await refreshTasks();
+    addToast("✅ Task created!");
+    logActivity(`Created task "${title}"`);
+  } catch (err) {
+    addToast("❌ Failed to create task", "error");
+  } finally {
+    setIsAdding(false);
+  }
+};
+
+
+
 
   const handleDeleteTask = async (taskId) => {
     const t = tasks.find(t => t._id === taskId);
