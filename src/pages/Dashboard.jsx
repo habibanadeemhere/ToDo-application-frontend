@@ -200,7 +200,7 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
           {/* history btn */}
           <button onClick={() => onHistory(task)} title="History" style={{ width: "26px", height: "26px", background: "rgba(88,166,255,0.08)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>📋</button>
          
-          {canEdit(task) && (
+          {canEdit && (
   <button onClick={() => onEdit(task)} title="Edit" style={{ width: "26px", height: "26px", background: "rgba(88,166,255,0.1)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
     onMouseEnter={e => e.currentTarget.style.background = "rgba(88,166,255,0.2)"}
     onMouseLeave={e => e.currentTarget.style.background = "rgba(88,166,255,0.1)"}>
@@ -213,7 +213,7 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
   </button>
 )}
 
-{canDelete(task) && (
+{canDelete && (
   <button onClick={() => onDeleteConfirm(task._id)} title="Delete" style={{ width: "26px", height: "26px", background: "rgba(255,86,48,0.1)", border: "1px solid rgba(255,86,48,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
     onMouseEnter={e => e.currentTarget.style.background = "rgba(255,86,48,0.2)"}
     onMouseLeave={e => e.currentTarget.style.background = "rgba(255,86,48,0.1)"}>
@@ -576,6 +576,7 @@ const createTask = async (e) => {
   const userAvatar  = currentUser.avatar || currentUser.profilePic || null;
   const hasActiveFilter = searchQuery || filterUser || filterPriority;
   const unreadCount = notifications.length;
+
 
   return (
     <>
