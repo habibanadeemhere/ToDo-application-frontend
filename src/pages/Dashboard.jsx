@@ -213,7 +213,7 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
   </button>
 )}
 
-{canDelete(task) && (
+{canDelete && (
   <button onClick={() => onDeleteConfirm(task._id)} title="Delete" style={{ width: "26px", height: "26px", background: "rgba(255,86,48,0.1)", border: "1px solid rgba(255,86,48,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
     onMouseEnter={e => e.currentTarget.style.background = "rgba(255,86,48,0.2)"}
     onMouseLeave={e => e.currentTarget.style.background = "rgba(255,86,48,0.1)"}>
@@ -577,7 +577,7 @@ const createTask = async (e) => {
   const hasActiveFilter = searchQuery || filterUser || filterPriority;
   const unreadCount = notifications.length;
 
-  return (
+ return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
