@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef, useCallback } from "react";
 import API from "../services/api";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
@@ -9,17 +10,19 @@ const EditCard = ({ task, col, initialImagePreview, onSave, onCancel, allUsers }
   const [editImage, setEditImage] = useState(null);
   const [editImagePreview, setEditImagePreview] = useState(initialImagePreview || null);
   const [localForm, setLocalForm] = useState({
-    title: task.title, description: task.description, status: task.status,
+    title: task.title, 
+    description: task.description, 
+    status: task.status,
     assignedTo: task.assignedTo?._id || task.assignedTo || "",
     dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
     priority: task.priority || "medium",
   });
 
-  const prevTasksRef = useRef([]);
-const notifiedDeadlines = useRef(new Set());
+  useEffect(() => { 
+    const t = setTimeout(() => titleRef.current?.focus(), 50); 
+    return () => clearTimeout(t); 
+  }, []);
 
-
-  useEffect(() => { const t = setTimeout(() => titleRef.current?.focus(), 50); return () => clearTimeout(t); }, []);
   const handleSave = () => onSave(task._id, localForm, editImage);
   const inp = { width: "100%", background: "rgba(255,255,255,0.05)", border: `1px solid ${col.accentBorder}`, borderRadius: "8px", padding: "8px 12px", color: "#e6edf3", fontSize: "13px", fontFamily: "Sora, sans-serif", outline: "none", marginBottom: "8px" };
 
@@ -79,7 +82,7 @@ const CommentsPanel = ({ task, currentUser, onClose }) => {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", backdropFilter: "blur(6px)", zIndex: 500, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
       <div style={{ width: "100%", maxWidth: "520px", background: "rgba(22,27,34,0.98)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "20px", overflow: "hidden", boxShadow: "0 40px 100px rgba(0,0,0,0.7)", display: "flex", flexDirection: "column", maxHeight: "80vh" }}>
-        <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid rgba(88,166,255,0.08)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ padding: "18px 20px 14px", borderBottom: "1px solid rgba(88,166,255,0.08)", display: "flex", alignItems: "center", justifySpaceBetween: "space-between" }}>
           <div>
             <div style={{ fontSize: "14px", fontWeight: "700", color: "#e6edf3" }}>💬 Comments</div>
             <div style={{ fontSize: "11px", color: "#7d8590", marginTop: "2px" }}>{task.title}</div>
@@ -95,7 +98,7 @@ const CommentsPanel = ({ task, currentUser, onClose }) => {
                 return (
                   <div key={c._id} style={{ marginBottom: "14px", display: "flex", gap: "10px", alignItems: "flex-start" }}>
                     <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #0052cc, #00b8d9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: "700", color: "#fff", flexShrink: 0, overflow: "hidden" }}>
-                      {c.user?.avatar ? <img src={c.user.avatar} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (c.user?.name || "?")[0].toUpperCase()}
+                      {c.user?.avatar ? <img src={c.user.avatar} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (c.user?.name || "?")[0].toUpperCase()}
                     </div>
                     <div style={{ flex: 1, background: "rgba(255,255,255,0.04)", borderRadius: "10px", padding: "10px 12px", border: "1px solid rgba(88,166,255,0.08)" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
@@ -168,7 +171,7 @@ const DueDateBadge = ({ dueDate }) => {
 };
 
 // ─── Task Card ──────────────────────────────────────────────────────────────────
-const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConfirm, deleteConfirm, onDeleteConfirmClose, onDelete, onMove, onComment, onHistory }) => {
+const TaskCard = ({ task, col, canEdit, canDelete, onEdit, onDeleteConfirm, deleteConfirm, onDeleteConfirmClose, onDelete, onMove, onComment, onHistory }) => {
   if (deleteConfirm === task._id) {
     return (
       <div style={{ background: "rgba(22,27,34,0.9)", border: "1px solid rgba(255,86,48,0.2)", borderRadius: "14px", padding: "20px 16px", marginBottom: "10px", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
@@ -195,37 +198,31 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6px" }}>
         <h3 style={{ fontSize: "14px", fontWeight: "600", color: "#e6edf3", lineHeight: "1.4", flex: 1 }}>{task.title}</h3>
         <div style={{ display: "flex", gap: "5px", marginLeft: "8px", flexShrink: 0 }}>
-          {/* comment btn — always visible */}
           <button onClick={() => onComment(task)} title="Comments" style={{ width: "26px", height: "26px", background: "rgba(101,84,192,0.1)", border: "1px solid rgba(101,84,192,0.2)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>💬</button>
-          {/* history btn */}
           <button onClick={() => onHistory(task)} title="History" style={{ width: "26px", height: "26px", background: "rgba(88,166,255,0.08)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>📋</button>
-         
+          
           {canEdit && (
-  <button onClick={() => onEdit(task)} title="Edit" style={{ width: "26px", height: "26px", background: "rgba(88,166,255,0.1)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-    onMouseEnter={e => e.currentTarget.style.background = "rgba(88,166,255,0.2)"}
-    onMouseLeave={e => e.currentTarget.style.background = "rgba(88,166,255,0.1)"}>
+            <button onClick={() => onEdit(task)} title="Edit" style={{ width: "26px", height: "26px", background: "rgba(88,166,255,0.1)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(88,166,255,0.2)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(88,166,255,0.1)"}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" strokeWidth="2.5">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+          )}
 
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" strokeWidth="2.5">
-      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-    </svg>
-
-  </button>
-)}
-
-{canDelete && (
-  <button onClick={() => onDeleteConfirm(task._id)} title="Delete" style={{ width: "26px", height: "26px", background: "rgba(255,86,48,0.1)", border: "1px solid rgba(255,86,48,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,86,48,0.2)"}
-    onMouseLeave={e => e.currentTarget.style.background = "rgba(255,86,48,0.1)"}>
-
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ff5630" strokeWidth="2.5">
-      <polyline points="3,6 5,6 21,6"/>
-      <path d="M19 6l-1 14H6L5 6"/>
-      <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
-    </svg>
-
-  </button>
-)}
+          {canDelete && (
+            <button onClick={() => onDeleteConfirm(task._id)} title="Delete" style={{ width: "26px", height: "26px", background: "rgba(255,86,48,0.1)", border: "1px solid rgba(255,86,48,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,86,48,0.2)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,86,48,0.1)"}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ff5630" strokeWidth="2.5">
+                <polyline points="3,6 5,6 21,6"/>
+                <path d="M19 6l-1 14H6L5 6"/>
+                <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
+              </svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -240,13 +237,13 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
       {task.assignedTo?.name && (
         <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px", padding: "5px 8px", background: "rgba(88,166,255,0.05)", borderRadius: "8px", border: "1px solid rgba(88,166,255,0.1)" }}>
           <div style={{ width: "20px", height: "20px", borderRadius: "50%", background: "linear-gradient(135deg, #0052cc, #00b8d9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "9px", fontWeight: "700", color: "#fff", flexShrink: 0, overflow: "hidden" }}>
-            {task.assignedTo.avatar ? <img src={task.assignedTo.avatar} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : task.assignedTo.name[0].toUpperCase()}
+            {task.assignedTo.avatar ? <img src={task.assignedTo.avatar} alt="avatar" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} /> : task.assignedTo.name[0].toUpperCase()}
           </div>
           <span style={{ fontSize: "11px", color: "#7d8590" }}>Assigned: <span style={{ color: "#c9d1d9", fontWeight: "600" }}>{task.assignedTo.name}</span></span>
         </div>
       )}
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifySpaceBetween: "space-between", marginBottom: "8px" }}>
         <span style={{ fontSize: "10px", fontWeight: "600", color: col.accent, background: col.accentBg, border: `1px solid ${col.accentBorder}`, padding: "3px 8px", borderRadius: "20px", textTransform: "uppercase", letterSpacing: "0.5px" }}>{col.label}</span>
         {task.user?.name && (
           <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
@@ -267,8 +264,6 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
     </div>
   );
 };
-
-
 
 // ─── Main Dashboard ──────────────────────────────────────────────────────────────
 function Dashboard() {
@@ -300,11 +295,11 @@ function Dashboard() {
   const notifRef     = useRef(null);
   const activityRef  = useRef(null);
   const prevTasksRef = useRef([]);
+  const notifiedDeadlines = useRef(new Set());
 
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const isAdmin = currentUser.role === "admin";
 
-  // ── helpers ──────────────────────────────────────────────────────────────────
   const addToast = useCallback((msg, type = "success") => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, msg, type }]);
@@ -325,193 +320,121 @@ function Dashboard() {
   const canDelete = useCallback((task) => isAdmin || checkOwner(task), [isAdmin, checkOwner]);
 
   const refreshTasks = useCallback(async () => {
-    const res = await API.get("/tasks");
-    setTasks(res.data.tasks || res.data);
+    try {
+      const res = await API.get("/tasks");
+      const fetched = res.data.tasks || res.data;
+      setTasks(fetched);
+      prevTasksRef.current = fetched;
+    } catch (err) { console.error(err); }
   }, []);
 
   const fetchUsers = useCallback(async () => {
     try { const res = await API.get("/auth/users"); setAllUsers(res.data || []); } catch {}
   }, []);
 
-  // ── Polling — replaces Socket.io (Vercel serverless = no WebSockets) ─────────
-  // Silently fetches every 4s, diffs against previous state, notifies on changes.
- useEffect(() => {
-  const myId = String(currentUser._id || currentUser.id || "");
+  // Polling hook with full architectural safety
+  useEffect(() => {
+    const myId = String(currentUser._id || currentUser.id || "");
+    
+    const poll = async () => {
+      try {
+        const res = await API.get("/tasks");
+        const fresh = res.data.tasks || res.data;
+        const prev = prevTasksRef.current;
 
-  const poll = async () => {
-    try {
-      const res = await API.get("/tasks");
-      const fresh = res.data.tasks || res.data;
-      const prev = prevTasksRef.current;
+        fresh.forEach((t) => {
+          const creatorId = String(typeof t.user === "object" ? t.user?._id : t.user);
+          const existed = prev.find((p) => p._id === t._id);
 
-      fresh.forEach((t) => {
-        const creatorId = String(
-          typeof t.user === "object" ? t.user?._id : t.user
-        );
-
-        const existed = prev.find((p) => p._id === t._id);
-
-        // New task by someone else
-        if (!existed && creatorId !== myId) {
-          addToast(`📌 ${t.user?.name || "Someone"} created "${t.title}"`);
-          logActivity(
-            `${t.user?.name || "Someone"} created "${t.title}"`
-          );
-        }
-
-        // Status changed by someone else
-        if (
-          existed &&
-          existed.status !== t.status &&
-          creatorId !== myId
-        ) {
-          addToast(`🔄 "${t.title}" moved to ${t.status}`);
-        }
-
-        // New comment by someone else
-        const oldCount = existed?.comments?.length || 0;
-        const freshCount = t.comments?.length || 0;
-
-        if (freshCount > oldCount) {
-          const latest = t.comments?.[t.comments.length - 1];
-
-          const commenterId = String(
-            typeof latest?.user === "object"
-              ? latest?.user?._id
-              : latest?.user
-          );
-
-          if (commenterId !== myId) {
-            addToast(`💬 New comment on "${t.title}"`);
+          if (!existed && creatorId !== myId) {
+            addToast(`📌 ${t.user?.name || "Someone"} created "${t.title}"`);
+            logActivity(`${t.user?.name || "Someone"} created "${t.title}"`);
           }
-        }
-      });
 
-      // Deadline notifications
-      const now = new Date();
+          if (existed && existed.status !== t.status && creatorId !== myId) {
+            addToast(`🔄 "${t.title}" moved to ${t.status}`);
+          }
 
-      fresh.forEach((t) => {
-        if (!t.dueDate || t.status === "done") return;
+          const oldCount = existed?.comments?.length || 0;
+          const freshCount = t.comments?.length || 0;
+          if (freshCount > oldCount) {
+            const latest = t.comments?.[t.comments.length - 1];
+            const commenterId = String(typeof latest?.user === "object" ? latest?.user?._id : latest?.user);
+            if (commenterId !== myId) {
+              addToast(`💬 New comment on "${t.title}"`);
+            }
+          }
+        });
 
-        const diff =
-          (new Date(t.dueDate) - now) / (1000 * 60 * 60);
+        const now = new Date();
+        fresh.forEach((t) => {
+          if (!t.dueDate || t.status === "done") return;
+          const diff = (new Date(t.dueDate) - now) / (1000 * 60 * 60);
 
-        if (
-          diff > 0 &&
-          diff <= 24 &&
-          !notifiedDeadlines.current.has(`due-${t._id}`)
-        ) {
-          addToast(`⏰ "${t.title}" due in < 24h`);
-          notifiedDeadlines.current.add(`due-${t._id}`);
-        }
+          if (diff > 0 && diff <= 24 && !notifiedDeadlines.current.has(`due-${t._id}`)) {
+            addToast(`⏰ "${t.title}" due in < 24h`);
+            notifiedDeadlines.current.add(`due-${t._id}`);
+          }
+          if (diff < 0 && !notifiedDeadlines.current.has(`overdue-${t._id}`)) {
+            addToast(`⚠ "${t.title}" is overdue!`, "error");
+            notifiedDeadlines.current.add(`overdue-${t._id}`);
+          }
+        });
 
-        if (
-          diff < 0 &&
-          !notifiedDeadlines.current.has(`overdue-${t._id}`)
-        ) {
-          addToast(`⚠ "${t.title}" is overdue!`, "error");
-          notifiedDeadlines.current.add(`overdue-${t._id}`);
-        }
-      });
+        prevTasksRef.current = fresh;
+        setTasks(fresh);
+      } catch (err) { console.error(err); }
+    };
 
-      prevTasksRef.current = fresh;
-      setTasks(fresh);
+    fetchUsers();
+    refreshTasks();
+
+    const interval = setInterval(poll, 4000);
+    return () => clearInterval(interval);
+  }, [addToast, logActivity, currentUser._id, currentUser.id, fetchUsers, refreshTasks]);
+
+  // Click outside listener
+  useEffect(() => {
+    const h = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifs(false);
+      if (activityRef.current && !activityRef.current.contains(e.target)) setShowActivity(false);
+    };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
+
+  const createTask = async (e) => {
+    e.preventDefault();
+    setIsAdding(true);
+    try {
+      const fd = new FormData();
+      fd.append("title", title);
+      fd.append("description", description);
+      fd.append("status", status);
+      fd.append("priority", priority);
+      if (dueDate) fd.append("dueDate", dueDate);
+      if (assignedTo) fd.append("assignedTo", assignedTo);
+      if (taskImage) fd.append("image", taskImage);
+
+      await API.post("/tasks", fd);
+      setTitle(""); setDescription(""); setStatus("todo"); setPriority("medium"); setDueDate(""); setAssignedTo(""); setTaskImage(null); setTaskImagePreview(null);
+      setShowAddForm(false);
+      await refreshTasks();
+      addToast("✅ Task created!");
+      logActivity(`Created task "${title}"`);
     } catch (err) {
-      console.error(err);
-    }
+      addToast("❌ Failed to create task", "error");
+    } finally { setIsAdding(false); }
   };
-
-  poll();
-  const interval = setInterval(poll, 4000);
-
-  return () => clearInterval(interval);
-}, []);
-
-// ───────────────── Initial Load ─────────────────
-useEffect(() => {
-  refreshTasks();
-  fetchUsers();
-}, []);
-
-// ───────────────── Update Previous Tasks Ref ─────────────────
-useEffect(() => {
-  prevTasksRef.current = tasks;
-}, [tasks]);
-
-// ───────────────── Close Panels on Outside Click ─────────────────
-useEffect(() => {
-  const h = (e) => {
-    if (
-      notifRef.current &&
-      !notifRef.current.contains(e.target)
-    ) {
-      setShowNotifs(false);
-    }
-
-    if (
-      activityRef.current &&
-      !activityRef.current.contains(e.target)
-    ) {
-      setShowActivity(false);
-    }
-  };
-
-  document.addEventListener("mousedown", h);
-
-  return () => {
-    document.removeEventListener("mousedown", h);
-  };
-}, []);
-
-  // ── CRUD ─────────────────────────────────────────────────────────────────────
-const createTask = async (e) => {
-  e.preventDefault();
-  setIsAdding(true);
-
-  try {
-    const fd = new FormData();
-
-    fd.append("title", title);
-    fd.append("description", description);
-    fd.append("status", status);
-    fd.append("priority", priority);
-
-    if (dueDate) fd.append("dueDate", dueDate);
-    if (assignedTo) fd.append("assignedTo", assignedTo);
-    if (taskImage) fd.append("image", taskImage);
-
-    await API.post("/tasks", fd);
-
-    setTitle("");
-    setDescription("");
-    setStatus("todo");
-    setPriority("medium");
-    setDueDate("");
-    setAssignedTo("");
-    setTaskImage(null);
-    setTaskImagePreview(null);
-
-    setShowAddForm(false);
-
-    await refreshTasks();
-    addToast("✅ Task created!");
-    logActivity(`Created task "${title}"`);
-  } catch (err) {
-    addToast("❌ Failed to create task", "error");
-  } finally {
-    setIsAdding(false);
-  }
-};
-
-
-
 
   const handleDeleteTask = async (taskId) => {
     const t = tasks.find(t => t._id === taskId);
     try {
       await API.delete(`/tasks/${taskId}`);
-      setDeleteConfirm(null); await refreshTasks();
-      addToast("🗑️ Task deleted"); logActivity(`Deleted "${t?.title}"`);
+      setDeleteConfirm(null); 
+      await refreshTasks();
+      addToast("🗑️ Task deleted"); 
+      logActivity(`Deleted "${t?.title}"`);
     } catch {}
   };
 
@@ -520,7 +443,8 @@ const createTask = async (e) => {
     setTasks(prev => prev.map(t => t._id === taskId ? { ...t, status: newStatus } : t));
     try {
       await API.put(`/tasks/${taskId}`, { status: newStatus });
-      addToast("✅ Moved!"); logActivity(`Moved "${t?.title}" → ${newStatus}`);
+      addToast("✅ Moved!"); 
+      logActivity(`Moved "${t?.title}" → ${newStatus}`);
     } catch { addToast("❌ Failed", "error"); refreshTasks(); }
   };
 
@@ -533,7 +457,8 @@ const createTask = async (e) => {
     setTasks(prev => prev.map(t => String(t._id) === taskId ? { ...t, status: newStatus } : t));
     try {
       await API.put(`/tasks/${taskId}`, { status: newStatus });
-      addToast("✅ Task moved!"); logActivity(`Dragged "${t?.title}" → ${newStatus}`);
+      addToast("✅ Task moved!"); 
+      logActivity(`Dragged "${t?.title}" → ${newStatus}`);
     } catch { addToast("❌ Move failed", "error"); refreshTasks(); }
   };
 
@@ -543,18 +468,22 @@ const createTask = async (e) => {
     const t = tasks.find(t => t._id === taskId);
     try {
       const fd = new FormData();
-      fd.append("title", localForm.title); fd.append("description", localForm.description);
-      fd.append("status", localForm.status); fd.append("priority", localForm.priority);
+      fd.append("title", localForm.title); 
+      fd.append("description", localForm.description);
+      fd.append("status", localForm.status); 
+      fd.append("priority", localForm.priority);
       if (localForm.dueDate) fd.append("dueDate", localForm.dueDate);
       if (localForm.assignedTo) fd.append("assignedTo", localForm.assignedTo);
       if (editImage) fd.append("image", editImage);
+      
       await API.put(`/tasks/${taskId}`, fd);
-      setEditingTask(null); await refreshTasks();
-      addToast("✏️ Updated!"); logActivity(`Updated "${t?.title || localForm.title}"`);
+      setEditingTask(null);
+      await refreshTasks();
+      addToast("✏️ Updated!"); 
+      logActivity(`Updated "${t?.title || localForm.title}"`);
     } catch { addToast("❌ Failed to update", "error"); }
   };
 
-  // ── Filters ──────────────────────────────────────────────────────────────────
   const applyFilters = (list) => list.filter(task => {
     const q = searchQuery.toLowerCase();
     const ms = !q || task.title?.toLowerCase().includes(q) || task.description?.toLowerCase().includes(q) || task.assignedTo?.name?.toLowerCase().includes(q) || task.user?.name?.toLowerCase().includes(q);
@@ -566,8 +495,9 @@ const createTask = async (e) => {
   const todoTasks     = applyFilters(tasks.filter(t => t.status === "todo"));
   const progressTasks = applyFilters(tasks.filter(t => t.status === "inprogress"));
   const doneTasks     = applyFilters(tasks.filter(t => t.status === "done"));
+
   const colConfig = [
-    { key: "todo",       label: "To Do",      tasks: todoTasks,     accent: "#ffab00", accentBg: "rgba(255,171,0,0.08)",  accentBorder: "rgba(255,171,0,0.2)" },
+    { key: "todo",       label: "To Do",       tasks: todoTasks,     accent: "#ffab00", accentBg: "rgba(255,171,0,0.08)",  accentBorder: "rgba(255,171,0,0.2)" },
     { key: "inprogress", label: "In Progress", tasks: progressTasks, accent: "#58a6ff", accentBg: "rgba(88,166,255,0.08)", accentBorder: "rgba(88,166,255,0.2)" },
     { key: "done",       label: "Done",        tasks: doneTasks,     accent: "#3fb950", accentBg: "rgba(63,185,80,0.08)",  accentBorder: "rgba(63,185,80,0.2)" },
   ];
@@ -577,7 +507,7 @@ const createTask = async (e) => {
   const hasActiveFilter = searchQuery || filterUser || filterPriority;
   const unreadCount = notifications.length;
 
- return (
+  return (
     <>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&display=swap');
@@ -611,18 +541,9 @@ const createTask = async (e) => {
         .dp-text { font-size: 12px; color: #c9d1d9; line-height: 1.5; flex: 1; }
         .dp-meta { font-size: 10px; color: #484f58; margin-top: 2px; }
         .drop-panel-empty { padding: 32px 16px; text-align: center; color: #484f58; font-size: 12px; }
-
-        /* online users */
-        .online-pill { display: flex; align-items: center; gap: 6px; background: rgba(63,185,80,0.08); border: 1px solid rgba(63,185,80,0.15); border-radius: 20px; padding: 4px 10px; }
-        .online-dot { width: 7px; height: 7px; border-radius: 50%; background: #3fb950; box-shadow: 0 0 6px #3fb950; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.5;} }
-        .online-text { font-size: 11px; color: "#3fb950"; font-weight: 600; }
-
-        /* role badge */
         .role-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 700; }
         .role-admin { background: rgba(255,171,0,0.12); color: #ffab00; border: 1px solid rgba(255,171,0,0.2); }
         .role-user  { background: rgba(88,166,255,0.1);  color: #58a6ff;  border: 1px solid rgba(88,166,255,0.2); }
-
         .user-chip { display: flex; align-items: center; gap: 10px; background: rgba(88,166,255,0.06); border: 1px solid rgba(88,166,255,0.12); border-radius: 30px; padding: 4px 14px 4px 4px; transition: border-color 0.2s; }
         .user-chip:hover { border-color: rgba(88,166,255,0.25); }
         .uav { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; overflow: hidden; background: linear-gradient(135deg, #0052cc, #00b8d9); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 2px rgba(88,166,255,0.3); }
@@ -632,7 +553,6 @@ const createTask = async (e) => {
         .u-role { font-size: 10px; color: #7d8590; }
         .logout-btn { padding: 7px 16px; background: rgba(255,86,48,0.1); border: 1px solid rgba(255,86,48,0.2); border-radius: 8px; color: #ff7452; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Sora', sans-serif; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
         .logout-btn:hover { background: rgba(255,86,48,0.18); }
-
         .filter-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
         .search-wrap { position: relative; flex: 1; min-width: 200px; }
         .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #7d8590; pointer-events: none; }
@@ -642,7 +562,6 @@ const createTask = async (e) => {
         .filter-sel { background: rgba(22,27,34,0.85); border: 1px solid rgba(88,166,255,0.1); border-radius: 10px; padding: 9px 12px; color: #c9d1d9; font-size: 12px; font-family: 'Sora', sans-serif; outline: none; cursor: pointer; }
         .clear-btn { padding: 9px 14px; background: rgba(255,86,48,0.1); border: 1px solid rgba(255,86,48,0.2); border-radius: 10px; color: #ff7452; font-size: 12px; cursor: pointer; font-family: 'Sora', sans-serif; white-space: nowrap; }
         .filter-active { display: inline-flex; align-items: center; gap: 4px; background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.2); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: #58a6ff; }
-
         .main-content { position: relative; z-index: 1; padding: 28px; }
         .add-task-bar { background: rgba(22,27,34,0.85); border: 1px solid rgba(88,166,255,0.1); border-radius: 16px; padding: 0; margin-bottom: 20px; overflow: hidden; backdrop-filter: blur(16px); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
         .add-task-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; transition: background 0.2s; }
@@ -668,21 +587,19 @@ const createTask = async (e) => {
         .submit-btn { padding: 10px 24px; background: linear-gradient(135deg, #0052cc, #0065ff); border: none; border-radius: 10px; color: #fff; font-size: 13px; font-weight: 700; font-family: 'Sora', sans-serif; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 12px rgba(0,82,204,0.35); white-space: nowrap; display: flex; align-items: center; justify-content: center; }
         .submit-btn:hover { transform: translateY(-1px); }
         .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
         .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         @media (max-width: 900px) { .board { grid-template-columns: 1fr; } }
-        .column { background: rgba(22,27,34,0.7); border-radius: 16px; padding: 0; border: 1px solid rgba(88,166,255,0.07); backdrop-filter: blur(12px); overflow: hidden; min-height: 500px; }
+        .column { background: rgba(22,27,34,0.7); border-radius: 16px; padding: 0; border: 1px solid rgba(88,166,255,0.07); backdrop-filter: blur(12px); overflow: hidden; min-height: 500px; display: flex; flexDirection: column; }
         .col-header { padding: 16px 18px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(88,166,255,0.07); position: sticky; top: 64px; background: rgba(22,27,34,0.95); backdrop-filter: blur(12px); z-index: 10; }
         .col-header-left { display: flex; align-items: center; gap: 8px; }
         .col-dot { width: 8px; height: 8px; border-radius: 50%; }
         .col-title { font-size: 13px; font-weight: 700; letter-spacing: -0.2px; }
         .col-count { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
-        .col-body { padding: 70px 20px 20px; }
+        .col-body { padding: 20px; flex: 1; min-height: 150px; }
         .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; color: #484f58; text-align: center; }
         .empty-state svg { margin-bottom: 10px; opacity: 0.4; }
         .empty-state p { font-size: 12px; }
         .img-preview-thumb { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; border: 1px solid rgba(88,166,255,0.2); }
-
         @keyframes spin { to { transform: rotate(360deg); } }
         .spin { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
         .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
@@ -709,7 +626,6 @@ const createTask = async (e) => {
           </div>
 
           <div className="nav-right">
-
             {/* activity */}
             <div className="activity-wrap" ref={activityRef}>
               <button className="icon-btn" onClick={() => { setShowActivity(p => !p); setShowNotifs(false); }} title="Activity log">
@@ -848,17 +764,18 @@ const createTask = async (e) => {
           <DragDropContext onDragEnd={handleDragEnd}>
             <div className="board">
               {colConfig.map((col) => (
-                <Droppable droppableId={col.key} key={col.key}>
-                  {(provided) => (
-                    <div className="column" ref={provided.innerRef} {...provided.droppableProps}>
-                      <div className="col-header">
-                        <div className="col-header-left">
-                          <div className="col-dot" style={{ background: col.accent, boxShadow: `0 0 6px ${col.accent}` }} />
-                          <span className="col-title" style={{ color: col.accent }}>{col.label}</span>
-                        </div>
-                        <span className="col-count" style={{ color: col.accent, background: col.accentBg, border: `1px solid ${col.accentBorder}` }}>{col.tasks.length}</span>
-                      </div>
-                      <div className="col-body">
+                <div className="column" key={col.key}>
+                  <div className="col-header">
+                    <div className="col-header-left">
+                      <div className="col-dot" style={{ background: col.accent, boxShadow: `0 0 6px ${col.accent}` }} />
+                      <span className="col-title" style={{ color: col.accent }}>{col.label}</span>
+                    </div>
+                    <span className="col-count" style={{ color: col.accent, background: col.accentBg, border: `1px solid ${col.accentBorder}` }}>{col.tasks.length}</span>
+                  </div>
+                  
+                  <Droppable droppableId={col.key}>
+                    {(provided) => (
+                      <div className="col-body" ref={provided.innerRef} {...provided.droppableProps}>
                         {col.tasks.length === 0 ? (
                           <div className="empty-state">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={col.accent} strokeWidth="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
@@ -881,9 +798,9 @@ const createTask = async (e) => {
                         )}
                         {provided.placeholder}
                       </div>
-                    </div>
-                  )}
-                </Droppable>
+                    )}
+                  </Droppable>
+                </div>
               ))}
             </div>
           </DragDropContext>
@@ -898,3 +815,4 @@ const createTask = async (e) => {
 }
 
 export default Dashboard;
+
