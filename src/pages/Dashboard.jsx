@@ -16,7 +16,7 @@ const EditCard = ({ task, col, initialImagePreview, onSave, onCancel, allUsers }
   });
 
   const prevTasksRef = useRef([]);
-const notifiedDeadlines = useRef(new Set());
+  const notifiedDeadlines = useRef(new Set());
 
 
   useEffect(() => { const t = setTimeout(() => titleRef.current?.focus(), 50); return () => clearTimeout(t); }, []);
@@ -91,25 +91,25 @@ const CommentsPanel = ({ task, currentUser, onClose }) => {
           {comments.length === 0
             ? <div style={{ textAlign: "center", color: "#484f58", fontSize: "12px", padding: "30px 0" }}>No comments yet. Be the first!</div>
             : comments.map(c => {
-                const isMe = String(c.user?._id || c.user) === String(currentUser._id || currentUser.id);
-                return (
-                  <div key={c._id} style={{ marginBottom: "14px", display: "flex", gap: "10px", alignItems: "flex-start" }}>
-                    <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #0052cc, #00b8d9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: "700", color: "#fff", flexShrink: 0, overflow: "hidden" }}>
-                      {c.user?.avatar ? <img src={c.user.avatar} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (c.user?.name || "?")[0].toUpperCase()}
-                    </div>
-                    <div style={{ flex: 1, background: "rgba(255,255,255,0.04)", borderRadius: "10px", padding: "10px 12px", border: "1px solid rgba(88,166,255,0.08)" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
-                        <span style={{ fontSize: "12px", fontWeight: "600", color: "#c9d1d9" }}>{c.user?.name || "User"}</span>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <span style={{ fontSize: "10px", color: "#484f58" }}>{new Date(c.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
-                          {isMe && <button onClick={() => deleteComment(c._id)} style={{ background: "none", border: "none", color: "#ff5630", cursor: "pointer", fontSize: "11px" }}>✕</button>}
-                        </div>
-                      </div>
-                      <p style={{ fontSize: "13px", color: "#7d8590", lineHeight: "1.5" }}>{c.text}</p>
-                    </div>
+              const isMe = String(c.user?._id || c.user) === String(currentUser._id || currentUser.id);
+              return (
+                <div key={c._id} style={{ marginBottom: "14px", display: "flex", gap: "10px", alignItems: "flex-start" }}>
+                  <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #0052cc, #00b8d9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", fontWeight: "700", color: "#fff", flexShrink: 0, overflow: "hidden" }}>
+                    {c.user?.avatar ? <img src={c.user.avatar} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (c.user?.name || "?")[0].toUpperCase()}
                   </div>
-                );
-              })
+                  <div style={{ flex: 1, background: "rgba(255,255,255,0.04)", borderRadius: "10px", padding: "10px 12px", border: "1px solid rgba(88,166,255,0.08)" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                      <span style={{ fontSize: "12px", fontWeight: "600", color: "#c9d1d9" }}>{c.user?.name || "User"}</span>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <span style={{ fontSize: "10px", color: "#484f58" }}>{new Date(c.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                        {isMe && <button onClick={() => deleteComment(c._id)} style={{ background: "none", border: "none", color: "#ff5630", cursor: "pointer", fontSize: "11px" }}>✕</button>}
+                      </div>
+                    </div>
+                    <p style={{ fontSize: "13px", color: "#7d8590", lineHeight: "1.5" }}>{c.text}</p>
+                  </div>
+                </div>
+              );
+            })
           }
           <div ref={bottomRef} />
         </div>
@@ -135,15 +135,15 @@ const HistoryPanel = ({ task, onClose }) => (
         {(!task.history || task.history.length === 0)
           ? <div style={{ textAlign: "center", color: "#484f58", fontSize: "12px", padding: "30px 0" }}>No history yet</div>
           : [...task.history].reverse().map((h, i) => (
-              <div key={i} style={{ display: "flex", gap: "12px", marginBottom: "14px", alignItems: "flex-start" }}>
-                <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#6554c0", flexShrink: 0, marginTop: "6px" }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: "12px", color: "#c9d1d9" }}><strong>{h.changedBy?.name || "Someone"}</strong> {h.action}</div>
-                  {h.oldValue && h.newValue && <div style={{ fontSize: "11px", color: "#7d8590", marginTop: "3px" }}>{h.field}: <span style={{ color: "#ff5630" }}>{h.oldValue}</span> → <span style={{ color: "#3fb950" }}>{h.newValue}</span></div>}
-                  <div style={{ fontSize: "10px", color: "#484f58", marginTop: "3px" }}>{new Date(h.changedAt).toLocaleString()}</div>
-                </div>
+            <div key={i} style={{ display: "flex", gap: "12px", marginBottom: "14px", alignItems: "flex-start" }}>
+              <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#6554c0", flexShrink: 0, marginTop: "6px" }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "12px", color: "#c9d1d9" }}><strong>{h.changedBy?.name || "Someone"}</strong> {h.action}</div>
+                {h.oldValue && h.newValue && <div style={{ fontSize: "11px", color: "#7d8590", marginTop: "3px" }}>{h.field}: <span style={{ color: "#ff5630" }}>{h.oldValue}</span> → <span style={{ color: "#3fb950" }}>{h.newValue}</span></div>}
+                <div style={{ fontSize: "10px", color: "#484f58", marginTop: "3px" }}>{new Date(h.changedAt).toLocaleString()}</div>
               </div>
-            ))
+            </div>
+          ))
         }
       </div>
     </div>
@@ -172,7 +172,7 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
   if (deleteConfirm === task._id) {
     return (
       <div style={{ background: "rgba(22,27,34,0.9)", border: "1px solid rgba(255,86,48,0.2)", borderRadius: "14px", padding: "20px 16px", marginBottom: "10px", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff5630" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff5630" strokeWidth="2"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
         <p style={{ fontSize: "13px", color: "#e6edf3", fontWeight: "600", textAlign: "center" }}>Delete this task?</p>
         <p style={{ fontSize: "11px", color: "#7d8590", textAlign: "center" }}>This can't be undone.</p>
         <div style={{ display: "flex", gap: "8px" }}>
@@ -199,33 +199,33 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
           <button onClick={() => onComment(task)} title="Comments" style={{ width: "26px", height: "26px", background: "rgba(101,84,192,0.1)", border: "1px solid rgba(101,84,192,0.2)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>💬</button>
           {/* history btn */}
           <button onClick={() => onHistory(task)} title="History" style={{ width: "26px", height: "26px", background: "rgba(88,166,255,0.08)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>📋</button>
-         
+
           {canEdit(task) && (
-  <button onClick={() => onEdit(task)} title="Edit" style={{ width: "26px", height: "26px", background: "rgba(88,166,255,0.1)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-    onMouseEnter={e => e.currentTarget.style.background = "rgba(88,166,255,0.2)"}
-    onMouseLeave={e => e.currentTarget.style.background = "rgba(88,166,255,0.1)"}>
+            <button onClick={() => onEdit(task)} title="Edit" style={{ width: "26px", height: "26px", background: "rgba(88,166,255,0.1)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(88,166,255,0.2)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(88,166,255,0.1)"}>
 
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" strokeWidth="2.5">
-      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-    </svg>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" strokeWidth="2.5">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
 
-  </button>
-)}
+            </button>
+          )}
 
-{canDelete(task) && (
-  <button onClick={() => onDeleteConfirm(task._id)} title="Delete" style={{ width: "26px", height: "26px", background: "rgba(255,86,48,0.1)", border: "1px solid rgba(255,86,48,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,86,48,0.2)"}
-    onMouseLeave={e => e.currentTarget.style.background = "rgba(255,86,48,0.1)"}>
+          {canDelete(task) && (
+            <button onClick={() => onDeleteConfirm(task._id)} title="Delete" style={{ width: "26px", height: "26px", background: "rgba(255,86,48,0.1)", border: "1px solid rgba(255,86,48,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,86,48,0.2)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,86,48,0.1)"}>
 
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ff5630" strokeWidth="2.5">
-      <polyline points="3,6 5,6 21,6"/>
-      <path d="M19 6l-1 14H6L5 6"/>
-      <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
-    </svg>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ff5630" strokeWidth="2.5">
+                <polyline points="3,6 5,6 21,6" />
+                <path d="M19 6l-1 14H6L5 6" />
+                <path d="M10 11v6M14 11v6M9 6V4h6v2" />
+              </svg>
 
-  </button>
-)}
+            </button>
+          )}
         </div>
       </div>
 
@@ -272,33 +272,33 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
 
 // ─── Main Dashboard ──────────────────────────────────────────────────────────────
 function Dashboard() {
-  const [tasks, setTasks]                 = useState([]);
-  const [allUsers, setAllUsers]           = useState([]);
-  const [activityLog, setActivityLog]     = useState([]);
-  const [title, setTitle]                 = useState("");
-  const [description, setDescription]     = useState("");
-  const [status, setStatus]               = useState("todo");
-  const [priority, setPriority]           = useState("medium");
-  const [dueDate, setDueDate]             = useState("");
-  const [assignedTo, setAssignedTo]       = useState("");
-  const [taskImage, setTaskImage]         = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [activityLog, setActivityLog] = useState([]);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState("todo");
+  const [priority, setPriority] = useState("medium");
+  const [dueDate, setDueDate] = useState("");
+  const [assignedTo, setAssignedTo] = useState("");
+  const [taskImage, setTaskImage] = useState(null);
   const [taskImagePreview, setTaskImagePreview] = useState(null);
-  const [isAdding, setIsAdding]           = useState(false);
-  const [editingTask, setEditingTask]     = useState(null);
+  const [isAdding, setIsAdding] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [showAddForm, setShowAddForm]     = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [showNotifs, setShowNotifs]       = useState(false);
-  const [showActivity, setShowActivity]   = useState(false);
-  const [toasts, setToasts]               = useState([]);
-  const [searchQuery, setSearchQuery]     = useState("");
-  const [filterUser, setFilterUser]       = useState("");
+  const [showNotifs, setShowNotifs] = useState(false);
+  const [showActivity, setShowActivity] = useState(false);
+  const [toasts, setToasts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterUser, setFilterUser] = useState("");
   const [filterPriority, setFilterPriority] = useState("");
-  const [commentTask, setCommentTask]     = useState(null);
-  const [historyTask, setHistoryTask]     = useState(null);
+  const [commentTask, setCommentTask] = useState(null);
+  const [historyTask, setHistoryTask] = useState(null);
   const fileInputRef = useRef(null);
-  const notifRef     = useRef(null);
-  const activityRef  = useRef(null);
+  const notifRef = useRef(null);
+  const activityRef = useRef(null);
   const prevTasksRef = useRef([]);
 
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
@@ -321,7 +321,7 @@ function Dashboard() {
     return String(tid) === String(currentUser._id || currentUser.id);
   }, [currentUser._id, currentUser.id]);
 
-  const canEdit   = useCallback((task) => isAdmin || checkOwner(task), [isAdmin, checkOwner]);
+  const canEdit = useCallback((task) => isAdmin || checkOwner(task), [isAdmin, checkOwner]);
   const canDelete = useCallback((task) => isAdmin || checkOwner(task), [isAdmin, checkOwner]);
 
   const refreshTasks = useCallback(async () => {
@@ -330,178 +330,178 @@ function Dashboard() {
   }, []);
 
   const fetchUsers = useCallback(async () => {
-    try { const res = await API.get("/auth/users"); setAllUsers(res.data || []); } catch {}
+    try { const res = await API.get("/auth/users"); setAllUsers(res.data || []); } catch { }
   }, []);
 
   // ── Polling — replaces Socket.io (Vercel serverless = no WebSockets) ─────────
   // Silently fetches every 4s, diffs against previous state, notifies on changes.
- useEffect(() => {
-  const myId = String(currentUser._id || currentUser.id || "");
+  useEffect(() => {
+    const myId = String(currentUser._id || currentUser.id || "");
 
-  const poll = async () => {
-    try {
-      const res = await API.get("/tasks");
-      const fresh = res.data.tasks || res.data;
-      const prev = prevTasksRef.current;
+    const poll = async () => {
+      try {
+        const res = await API.get("/tasks");
+        const fresh = res.data.tasks || res.data;
+        const prev = prevTasksRef.current;
 
-      fresh.forEach((t) => {
-        const creatorId = String(
-          typeof t.user === "object" ? t.user?._id : t.user
-        );
-
-        const existed = prev.find((p) => p._id === t._id);
-
-        // New task by someone else
-        if (!existed && creatorId !== myId) {
-          addToast(`📌 ${t.user?.name || "Someone"} created "${t.title}"`);
-          logActivity(
-            `${t.user?.name || "Someone"} created "${t.title}"`
-          );
-        }
-
-        // Status changed by someone else
-        if (
-          existed &&
-          existed.status !== t.status &&
-          creatorId !== myId
-        ) {
-          addToast(`🔄 "${t.title}" moved to ${t.status}`);
-        }
-
-        // New comment by someone else
-        const oldCount = existed?.comments?.length || 0;
-        const freshCount = t.comments?.length || 0;
-
-        if (freshCount > oldCount) {
-          const latest = t.comments?.[t.comments.length - 1];
-
-          const commenterId = String(
-            typeof latest?.user === "object"
-              ? latest?.user?._id
-              : latest?.user
+        fresh.forEach((t) => {
+          const creatorId = String(
+            typeof t.user === "object" ? t.user?._id : t.user
           );
 
-          if (commenterId !== myId) {
-            addToast(`💬 New comment on "${t.title}"`);
+          const existed = prev.find((p) => p._id === t._id);
+
+          // New task by someone else
+          if (!existed && creatorId !== myId) {
+            addToast(`📌 ${t.user?.name || "Someone"} created "${t.title}"`);
+            logActivity(
+              `${t.user?.name || "Someone"} created "${t.title}"`
+            );
           }
-        }
-      });
 
-      // Deadline notifications
-      const now = new Date();
+          // Status changed by someone else
+          if (
+            existed &&
+            existed.status !== t.status &&
+            creatorId !== myId
+          ) {
+            addToast(`🔄 "${t.title}" moved to ${t.status}`);
+          }
 
-      fresh.forEach((t) => {
-        if (!t.dueDate || t.status === "done") return;
+          // New comment by someone else
+          const oldCount = existed?.comments?.length || 0;
+          const freshCount = t.comments?.length || 0;
 
-        const diff =
-          (new Date(t.dueDate) - now) / (1000 * 60 * 60);
+          if (freshCount > oldCount) {
+            const latest = t.comments?.[t.comments.length - 1];
 
-        if (
-          diff > 0 &&
-          diff <= 24 &&
-          !notifiedDeadlines.current.has(`due-${t._id}`)
-        ) {
-          addToast(`⏰ "${t.title}" due in < 24h`);
-          notifiedDeadlines.current.add(`due-${t._id}`);
-        }
+            const commenterId = String(
+              typeof latest?.user === "object"
+                ? latest?.user?._id
+                : latest?.user
+            );
 
-        if (
-          diff < 0 &&
-          !notifiedDeadlines.current.has(`overdue-${t._id}`)
-        ) {
-          addToast(`⚠ "${t.title}" is overdue!`, "error");
-          notifiedDeadlines.current.add(`overdue-${t._id}`);
-        }
-      });
+            if (commenterId !== myId) {
+              addToast(`💬 New comment on "${t.title}"`);
+            }
+          }
+        });
 
-      prevTasksRef.current = fresh;
-      setTasks(fresh);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+        // Deadline notifications
+        const now = new Date();
 
-  poll();
-  const interval = setInterval(poll, 4000);
+        fresh.forEach((t) => {
+          if (!t.dueDate || t.status === "done") return;
 
-  return () => clearInterval(interval);
-}, []);
+          const diff =
+            (new Date(t.dueDate) - now) / (1000 * 60 * 60);
 
-// ───────────────── Initial Load ─────────────────
-useEffect(() => {
-  refreshTasks();
-  fetchUsers();
-}, []);
+          if (
+            diff > 0 &&
+            diff <= 24 &&
+            !notifiedDeadlines.current.has(`due-${t._id}`)
+          ) {
+            addToast(`⏰ "${t.title}" due in < 24h`);
+            notifiedDeadlines.current.add(`due-${t._id}`);
+          }
 
-// ───────────────── Update Previous Tasks Ref ─────────────────
-useEffect(() => {
-  prevTasksRef.current = tasks;
-}, [tasks]);
+          if (
+            diff < 0 &&
+            !notifiedDeadlines.current.has(`overdue-${t._id}`)
+          ) {
+            addToast(`⚠ "${t.title}" is overdue!`, "error");
+            notifiedDeadlines.current.add(`overdue-${t._id}`);
+          }
+        });
 
-// ───────────────── Close Panels on Outside Click ─────────────────
-useEffect(() => {
-  const h = (e) => {
-    if (
-      notifRef.current &&
-      !notifRef.current.contains(e.target)
-    ) {
-      setShowNotifs(false);
-    }
+        prevTasksRef.current = fresh;
+        setTasks(fresh);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-    if (
-      activityRef.current &&
-      !activityRef.current.contains(e.target)
-    ) {
-      setShowActivity(false);
-    }
-  };
+    poll();
+    const interval = setInterval(poll, 4000);
 
-  document.addEventListener("mousedown", h);
+    return () => clearInterval(interval);
+  }, []);
 
-  return () => {
-    document.removeEventListener("mousedown", h);
-  };
-}, []);
+  // ───────────────── Initial Load ─────────────────
+  useEffect(() => {
+    refreshTasks();
+    fetchUsers();
+  }, []);
+
+  // ───────────────── Update Previous Tasks Ref ─────────────────
+  useEffect(() => {
+    prevTasksRef.current = tasks;
+  }, [tasks]);
+
+  // ───────────────── Close Panels on Outside Click ─────────────────
+  useEffect(() => {
+    const h = (e) => {
+      if (
+        notifRef.current &&
+        !notifRef.current.contains(e.target)
+      ) {
+        setShowNotifs(false);
+      }
+
+      if (
+        activityRef.current &&
+        !activityRef.current.contains(e.target)
+      ) {
+        setShowActivity(false);
+      }
+    };
+
+    document.addEventListener("mousedown", h);
+
+    return () => {
+      document.removeEventListener("mousedown", h);
+    };
+  }, []);
 
   // ── CRUD ─────────────────────────────────────────────────────────────────────
-const createTask = async (e) => {
-  e.preventDefault();
-  setIsAdding(true);
+  const createTask = async (e) => {
+    e.preventDefault();
+    setIsAdding(true);
 
-  try {
-    const fd = new FormData();
+    try {
+      const fd = new FormData();
 
-    fd.append("title", title);
-    fd.append("description", description);
-    fd.append("status", status);
-    fd.append("priority", priority);
+      fd.append("title", title);
+      fd.append("description", description);
+      fd.append("status", status);
+      fd.append("priority", priority);
 
-    if (dueDate) fd.append("dueDate", dueDate);
-    if (assignedTo) fd.append("assignedTo", assignedTo);
-    if (taskImage) fd.append("image", taskImage);
+      if (dueDate) fd.append("dueDate", dueDate);
+      if (assignedTo) fd.append("assignedTo", assignedTo);
+      if (taskImage) fd.append("image", taskImage);
 
-    await API.post("/tasks", fd);
+      await API.post("/tasks", fd);
 
-    setTitle("");
-    setDescription("");
-    setStatus("todo");
-    setPriority("medium");
-    setDueDate("");
-    setAssignedTo("");
-    setTaskImage(null);
-    setTaskImagePreview(null);
+      setTitle("");
+      setDescription("");
+      setStatus("todo");
+      setPriority("medium");
+      setDueDate("");
+      setAssignedTo("");
+      setTaskImage(null);
+      setTaskImagePreview(null);
 
-    setShowAddForm(false);
+      setShowAddForm(false);
 
-    await refreshTasks();
-    addToast("✅ Task created!");
-    logActivity(`Created task "${title}"`);
-  } catch (err) {
-    addToast("❌ Failed to create task", "error");
-  } finally {
-    setIsAdding(false);
-  }
-};
+      await refreshTasks();
+      addToast("✅ Task created!");
+      logActivity(`Created task "${title}"`);
+    } catch (err) {
+      addToast("❌ Failed to create task", "error");
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
 
 
@@ -512,7 +512,7 @@ const createTask = async (e) => {
       await API.delete(`/tasks/${taskId}`);
       setDeleteConfirm(null); await refreshTasks();
       addToast("🗑️ Task deleted"); logActivity(`Deleted "${t?.title}"`);
-    } catch {}
+    } catch { }
   };
 
   const moveTask = async (taskId, newStatus) => {
@@ -563,17 +563,17 @@ const createTask = async (e) => {
     return ms && mu && mp;
   });
 
-  const todoTasks     = applyFilters(tasks.filter(t => t.status === "todo"));
+  const todoTasks = applyFilters(tasks.filter(t => t.status === "todo"));
   const progressTasks = applyFilters(tasks.filter(t => t.status === "inprogress"));
-  const doneTasks     = applyFilters(tasks.filter(t => t.status === "done"));
+  const doneTasks = applyFilters(tasks.filter(t => t.status === "done"));
   const colConfig = [
-    { key: "todo",       label: "To Do",      tasks: todoTasks,     accent: "#ffab00", accentBg: "rgba(255,171,0,0.08)",  accentBorder: "rgba(255,171,0,0.2)" },
+    { key: "todo", label: "To Do", tasks: todoTasks, accent: "#ffab00", accentBg: "rgba(255,171,0,0.08)", accentBorder: "rgba(255,171,0,0.2)" },
     { key: "inprogress", label: "In Progress", tasks: progressTasks, accent: "#58a6ff", accentBg: "rgba(88,166,255,0.08)", accentBorder: "rgba(88,166,255,0.2)" },
-    { key: "done",       label: "Done",        tasks: doneTasks,     accent: "#3fb950", accentBg: "rgba(63,185,80,0.08)",  accentBorder: "rgba(63,185,80,0.2)" },
+    { key: "done", label: "Done", tasks: doneTasks, accent: "#3fb950", accentBg: "rgba(63,185,80,0.08)", accentBorder: "rgba(63,185,80,0.2)" },
   ];
 
   const userInitial = (currentUser.name || "U")[0].toUpperCase();
-  const userAvatar  = currentUser.avatar || currentUser.profilePic || null;
+  const userAvatar = currentUser.avatar || currentUser.profilePic || null;
   const hasActiveFilter = searchQuery || filterUser || filterPriority;
   const unreadCount = notifications.length;
 
@@ -704,7 +704,7 @@ const createTask = async (e) => {
         <nav className="navbar">
           <div className="nav-brand">
             <div className="nav-logo">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="14" rx="2" fill="white" opacity="0.9"/><rect x="14" y="3" width="7" height="9" rx="2" fill="white" opacity="0.6"/></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="14" rx="2" fill="white" opacity="0.9" /><rect x="14" y="3" width="7" height="9" rx="2" fill="white" opacity="0.6" /></svg>
             </div>
             <span className="nav-title">Task<span>Flow</span></span>
           </div>
@@ -714,7 +714,7 @@ const createTask = async (e) => {
             {/* activity */}
             <div className="activity-wrap" ref={activityRef}>
               <button className="icon-btn" onClick={() => { setShowActivity(p => !p); setShowNotifs(false); }} title="Activity log">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10" /><polyline points="12,6 12,12 16,14" /></svg>
                 {activityLog.length > 0 && <span className="icon-badge">{activityLog.length > 9 ? "9+" : activityLog.length}</span>}
               </button>
               {showActivity && (
@@ -726,11 +726,11 @@ const createTask = async (e) => {
                   <div className="drop-panel-list">
                     {activityLog.length === 0 ? <div className="drop-panel-empty">No activity yet</div>
                       : activityLog.map(a => (
-                          <div className="drop-panel-item" key={a.id}>
-                            <div className="dp-dot activity" />
-                            <div style={{ flex: 1 }}><div className="dp-text"><strong>{a.user}</strong> {a.msg}</div><div className="dp-meta">{a.date} · {a.time}</div></div>
-                          </div>
-                        ))
+                        <div className="drop-panel-item" key={a.id}>
+                          <div className="dp-dot activity" />
+                          <div style={{ flex: 1 }}><div className="dp-text"><strong>{a.user}</strong> {a.msg}</div><div className="dp-meta">{a.date} · {a.time}</div></div>
+                        </div>
+                      ))
                     }
                   </div>
                 </div>
@@ -740,7 +740,7 @@ const createTask = async (e) => {
             {/* notifications */}
             <div className="notif-wrap" ref={notifRef}>
               <button className="icon-btn" onClick={() => { setShowNotifs(p => !p); setShowActivity(false); }} title="Notifications">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 01-3.46 0" /></svg>
                 {unreadCount > 0 && <span className="icon-badge">{unreadCount > 9 ? "9+" : unreadCount}</span>}
               </button>
               {showNotifs && (
@@ -752,11 +752,11 @@ const createTask = async (e) => {
                   <div className="drop-panel-list">
                     {notifications.length === 0 ? <div className="drop-panel-empty">No notifications yet</div>
                       : notifications.map(n => (
-                          <div className="drop-panel-item" key={n.id}>
-                            <div className={`dp-dot ${n.type === "error" ? "error" : ""}`} />
-                            <div style={{ flex: 1 }}><div className="dp-text">{n.msg}</div><div className="dp-meta">{n.time}</div></div>
-                          </div>
-                        ))
+                        <div className="drop-panel-item" key={n.id}>
+                          <div className={`dp-dot ${n.type === "error" ? "error" : ""}`} />
+                          <div style={{ flex: 1 }}><div className="dp-text">{n.msg}</div><div className="dp-meta">{n.time}</div></div>
+                        </div>
+                      ))
                     }
                   </div>
                 </div>
@@ -776,7 +776,7 @@ const createTask = async (e) => {
             </div>
 
             <button className="logout-btn" onClick={() => { localStorage.clear(); window.location.href = "/"; }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" /></svg>
               Logout
             </button>
           </div>
@@ -787,10 +787,10 @@ const createTask = async (e) => {
           <div className="add-task-bar">
             <div className="add-task-header" onClick={() => setShowAddForm(!showAddForm)}>
               <div className="add-task-header-left">
-                <div className="add-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+                <div className="add-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg></div>
                 <span className="add-task-label">Add new task</span>
               </div>
-              <svg className={`chevron ${showAddForm ? "open" : ""}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,9 12,15 18,9"/></svg>
+              <svg className={`chevron ${showAddForm ? "open" : ""}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6,9 12,15 18,9" /></svg>
             </div>
             {showAddForm && (
               <div className="add-form-body">
@@ -816,7 +816,7 @@ const createTask = async (e) => {
                     <div className="form-field" style={{ flex: 1 }}>
                       <label>Image (optional)</label>
                       <div className="img-drop" onClick={() => fileInputRef.current?.click()}>
-                        {taskImagePreview ? <><img src={taskImagePreview} className="img-preview-thumb" alt="preview" /><span style={{ color: "#58a6ff" }}>Change</span></> : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg><span>Click to <span>upload</span></span></>}
+                        {taskImagePreview ? <><img src={taskImagePreview} className="img-preview-thumb" alt="preview" /><span style={{ color: "#58a6ff" }}>Change</span></> : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21,15 16,10 5,21" /></svg><span>Click to <span>upload</span></span></>}
                         <input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => { const f = e.target.files[0]; if (f) { setTaskImage(f); const r = new FileReader(); r.onloadend = () => setTaskImagePreview(r.result); r.readAsDataURL(f); } }} />
                       </div>
                     </div>
@@ -830,7 +830,7 @@ const createTask = async (e) => {
           {/* Filter bar */}
           <div className="filter-bar">
             <div className="search-wrap">
-              <span className="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+              <span className="search-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg></span>
               <input className="search-inp" placeholder="Search by title, description, or user…" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
             </div>
             <select className="filter-sel" value={filterUser} onChange={(e) => setFilterUser(e.target.value)}>
@@ -842,7 +842,7 @@ const createTask = async (e) => {
               <option value="high">🔴 High</option><option value="medium">🟡 Medium</option><option value="low">🟢 Low</option>
             </select>
             {hasActiveFilter && <button className="clear-btn" onClick={() => { setSearchQuery(""); setFilterUser(""); setFilterPriority(""); }}>✕ Clear</button>}
-            {hasActiveFilter && <span className="filter-active"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/></svg>Filtered</span>}
+            {hasActiveFilter && <span className="filter-active"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46" /></svg>Filtered</span>}
           </div>
 
           {/* Board */}
@@ -862,7 +862,7 @@ const createTask = async (e) => {
                       <div className="col-body">
                         {col.tasks.length === 0 ? (
                           <div className="empty-state">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={col.accent} strokeWidth="1.5"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={col.accent} strokeWidth="1.5"><rect x="5" y="2" width="14" height="20" rx="2" /><line x1="9" y1="9" x2="15" y2="9" /><line x1="9" y1="13" x2="15" y2="13" /></svg>
                             <p>{hasActiveFilter ? "No matching tasks" : `No ${col.label.toLowerCase()} tasks yet`}</p>
                           </div>
                         ) : (
@@ -873,7 +873,21 @@ const createTask = async (e) => {
                               <Draggable draggableId={String(task._id)} index={index} key={String(task._id)}>
                                 {(provided) => (
                                   <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                    <TaskCard task={task} col={col} isOwner={checkOwner(task)} canEdit={canEdit(task)} canDelete={canDelete(task)} onEdit={startEdit} onDeleteConfirm={setDeleteConfirm} deleteConfirm={deleteConfirm} onDeleteConfirmClose={() => setDeleteConfirm(null)} onDelete={handleDeleteTask} onMove={moveTask} onComment={setCommentTask} onHistory={setHistoryTask} />
+                                   <TaskCard
+  task={task}
+  col={col}
+  isOwner={checkOwner(task)}
+  canEdit={canEdit}
+  canDelete={canDelete}
+  onEdit={startEdit}
+  onDeleteConfirm={setDeleteConfirm}
+  deleteConfirm={deleteConfirm}
+  onDeleteConfirmClose={() => setDeleteConfirm(null)}
+  onDelete={handleDeleteTask}
+  onMove={moveTask}
+  onComment={setCommentTask}
+  onHistory={setHistoryTask}
+/>
                                   </div>
                                 )}
                               </Draggable>
