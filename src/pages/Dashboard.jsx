@@ -15,10 +15,6 @@ const EditCard = ({ task, col, initialImagePreview, onSave, onCancel, allUsers }
     priority: task.priority || "medium",
   });
 
-  const prevTasksRef = useRef([]);
-const notifiedDeadlines = useRef(new Set());
-
-
   useEffect(() => { const t = setTimeout(() => titleRef.current?.focus(), 50); return () => clearTimeout(t); }, []);
   const handleSave = () => onSave(task._id, localForm, editImage);
   const inp = { width: "100%", background: "rgba(255,255,255,0.05)", border: `1px solid ${col.accentBorder}`, borderRadius: "8px", padding: "8px 12px", color: "#e6edf3", fontSize: "13px", fontFamily: "Sora, sans-serif", outline: "none", marginBottom: "8px" };
@@ -199,33 +195,18 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
           <button onClick={() => onComment(task)} title="Comments" style={{ width: "26px", height: "26px", background: "rgba(101,84,192,0.1)", border: "1px solid rgba(101,84,192,0.2)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>💬</button>
           {/* history btn */}
           <button onClick={() => onHistory(task)} title="History" style={{ width: "26px", height: "26px", background: "rgba(88,166,255,0.08)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px" }}>📋</button>
-         
           {canEdit && (
-  <button onClick={() => onEdit(task)} title="Edit" style={{ width: "26px", height: "26px", background: "rgba(88,166,255,0.1)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-    onMouseEnter={e => e.currentTarget.style.background = "rgba(88,166,255,0.2)"}
-    onMouseLeave={e => e.currentTarget.style.background = "rgba(88,166,255,0.1)"}>
-
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" strokeWidth="2.5">
-      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-      <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-    </svg>
-
-  </button>
-)}
-
-{canDelete && (
-  <button onClick={() => onDeleteConfirm(task._id)} title="Delete" style={{ width: "26px", height: "26px", background: "rgba(255,86,48,0.1)", border: "1px solid rgba(255,86,48,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
-    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,86,48,0.2)"}
-    onMouseLeave={e => e.currentTarget.style.background = "rgba(255,86,48,0.1)"}>
-
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ff5630" strokeWidth="2.5">
-      <polyline points="3,6 5,6 21,6"/>
-      <path d="M19 6l-1 14H6L5 6"/>
-      <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
-    </svg>
-
-  </button>
-)}
+            <button onClick={() => onEdit(task)} title="Edit" style={{ width: "26px", height: "26px", background: "rgba(88,166,255,0.1)", border: "1px solid rgba(88,166,255,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(88,166,255,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(88,166,255,0.1)"}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#58a6ff" strokeWidth="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+          )}
+          {canDelete && (
+            <button onClick={() => onDeleteConfirm(task._id)} title="Delete" style={{ width: "26px", height: "26px", background: "rgba(255,86,48,0.1)", border: "1px solid rgba(255,86,48,0.15)", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,86,48,0.2)"} onMouseLeave={e => e.currentTarget.style.background = "rgba(255,86,48,0.1)"}>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#ff5630" strokeWidth="2.5"><polyline points="3,6 5,6 21,6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -267,8 +248,6 @@ const TaskCard = ({ task, col, isOwner, canEdit, canDelete, onEdit, onDeleteConf
     </div>
   );
 };
-
-
 
 // ─── Main Dashboard ──────────────────────────────────────────────────────────────
 function Dashboard() {
@@ -335,176 +314,92 @@ function Dashboard() {
 
   // ── Polling — replaces Socket.io (Vercel serverless = no WebSockets) ─────────
   // Silently fetches every 4s, diffs against previous state, notifies on changes.
- useEffect(() => {
-  const myId = String(currentUser._id || currentUser.id || "");
+  useEffect(() => {
+    const myId = String(currentUser._id || currentUser.id || "");
 
-  const poll = async () => {
-    try {
-      const res = await API.get("/tasks");
-      const fresh = res.data.tasks || res.data;
-      const prev = prevTasksRef.current;
+    const poll = async () => {
+      try {
+        const res = await API.get("/tasks");
+        const fresh = res.data.tasks || res.data;
+        const prev  = prevTasksRef.current;
 
-      fresh.forEach((t) => {
-        const creatorId = String(
-          typeof t.user === "object" ? t.user?._id : t.user
-        );
+        fresh.forEach(t => {
+          const creatorId = String(typeof t.user === "object" ? t.user?._id : t.user);
+          const existed   = prev.find(p => p._id === t._id);
 
-        const existed = prev.find((p) => p._id === t._id);
-
-        // New task by someone else
-        if (!existed && creatorId !== myId) {
-          addToast(`📌 ${t.user?.name || "Someone"} created "${t.title}"`);
-          logActivity(
-            `${t.user?.name || "Someone"} created "${t.title}"`
-          );
-        }
-
-        // Status changed by someone else
-        if (
-          existed &&
-          existed.status !== t.status &&
-          creatorId !== myId
-        ) {
-          addToast(`🔄 "${t.title}" moved to ${t.status}`);
-        }
-
-        // New comment by someone else
-        const oldCount = existed?.comments?.length || 0;
-        const freshCount = t.comments?.length || 0;
-
-        if (freshCount > oldCount) {
-          const latest = t.comments?.[t.comments.length - 1];
-
-          const commenterId = String(
-            typeof latest?.user === "object"
-              ? latest?.user?._id
-              : latest?.user
-          );
-
-          if (commenterId !== myId) {
-            addToast(`💬 New comment on "${t.title}"`);
+          // new task by someone else
+          if (!existed && creatorId !== myId) {
+            addToast(`📌 ${t.user?.name || "Someone"} created "${t.title}"`);
+            logActivity(`${t.user?.name || "Someone"} created "${t.title}"`);
           }
-        }
-      });
 
-      // Deadline notifications
-      const now = new Date();
+          // status changed by someone else
+          if (existed && existed.status !== t.status && creatorId !== myId) {
+            addToast(`🔄 "${t.title}" moved to ${t.status}`);
+          }
 
-      fresh.forEach((t) => {
-        if (!t.dueDate || t.status === "done") return;
+          // new comment by someone else
+          const oldCount   = existed?.comments?.length || 0;
+          const freshCount = t.comments?.length || 0;
+          if (freshCount > oldCount) {
+            const latest      = t.comments?.[t.comments.length - 1];
+            const commenterId = String(typeof latest?.user === "object" ? latest?.user?._id : latest?.user);
+            if (commenterId !== myId) addToast(`💬 New comment on "${t.title}"`);
+          }
+        });
 
-        const diff =
-          (new Date(t.dueDate) - now) / (1000 * 60 * 60);
+        // deadline checks (runs every poll, deduplicated by toast timeout)
+        const now = new Date();
+        fresh.forEach(t => {
+          if (!t.dueDate || t.status === "done") return;
+          const diff = (new Date(t.dueDate) - now) / (1000 * 60 * 60);
+          if (diff > 0 && diff <= 24) addToast(`⏰ "${t.title}" due in < 24h`);
+          if (diff < 0) addToast(`⚠ "${t.title}" is overdue!`, "error");
+        });
 
-        if (
-          diff > 0 &&
-          diff <= 24 &&
-          !notifiedDeadlines.current.has(`due-${t._id}`)
-        ) {
-          addToast(`⏰ "${t.title}" due in < 24h`);
-          notifiedDeadlines.current.add(`due-${t._id}`);
-        }
+        prevTasksRef.current = fresh;
+        setTasks(fresh);
+      } catch { /* silent — avoid toast spam on network hiccup */ }
+    };
 
-        if (
-          diff < 0 &&
-          !notifiedDeadlines.current.has(`overdue-${t._id}`)
-        ) {
-          addToast(`⚠ "${t.title}" is overdue!`, "error");
-          notifiedDeadlines.current.add(`overdue-${t._id}`);
-        }
-      });
+    // initial seed of prevTasksRef so first poll doesn't false-positive everything
+    prevTasksRef.current = tasks;
+    const interval = setInterval(poll, 4000);
+    return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-      prevTasksRef.current = fresh;
-      setTasks(fresh);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  useEffect(() => { refreshTasks(); fetchUsers(); }, []);
 
-  poll();
-  const interval = setInterval(poll, 4000);
-
-  return () => clearInterval(interval);
-}, []);
-
-// ───────────────── Initial Load ─────────────────
-useEffect(() => {
-  refreshTasks();
-  fetchUsers();
-}, []);
-
-// ───────────────── Update Previous Tasks Ref ─────────────────
-useEffect(() => {
-  prevTasksRef.current = tasks;
-}, [tasks]);
-
-// ───────────────── Close Panels on Outside Click ─────────────────
-useEffect(() => {
-  const h = (e) => {
-    if (
-      notifRef.current &&
-      !notifRef.current.contains(e.target)
-    ) {
-      setShowNotifs(false);
-    }
-
-    if (
-      activityRef.current &&
-      !activityRef.current.contains(e.target)
-    ) {
-      setShowActivity(false);
-    }
-  };
-
-  document.addEventListener("mousedown", h);
-
-  return () => {
-    document.removeEventListener("mousedown", h);
-  };
-}, []);
+  // close panels on outside click
+  useEffect(() => {
+    const h = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifs(false);
+      if (activityRef.current && !activityRef.current.contains(e.target)) setShowActivity(false);
+    };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
 
   // ── CRUD ─────────────────────────────────────────────────────────────────────
-const createTask = async (e) => {
-  e.preventDefault();
-  setIsAdding(true);
-
-  try {
-    const fd = new FormData();
-
-    fd.append("title", title);
-    fd.append("description", description);
-    fd.append("status", status);
-    fd.append("priority", priority);
-
-    if (dueDate) fd.append("dueDate", dueDate);
-    if (assignedTo) fd.append("assignedTo", assignedTo);
-    if (taskImage) fd.append("image", taskImage);
-
-    await API.post("/tasks", fd);
-
-    setTitle("");
-    setDescription("");
-    setStatus("todo");
-    setPriority("medium");
-    setDueDate("");
-    setAssignedTo("");
-    setTaskImage(null);
-    setTaskImagePreview(null);
-
-    setShowAddForm(false);
-
-    await refreshTasks();
-    addToast("✅ Task created!");
-    logActivity(`Created task "${title}"`);
-  } catch (err) {
-    addToast("❌ Failed to create task", "error");
-  } finally {
-    setIsAdding(false);
-  }
-};
-
-
-
+  const createTask = async (e) => {
+    e.preventDefault();
+    setIsAdding(true);
+    try {
+      const fd = new FormData();
+      fd.append("title", title); fd.append("description", description);
+      fd.append("status", status); fd.append("priority", priority);
+      if (dueDate) fd.append("dueDate", dueDate);
+      if (assignedTo) fd.append("assignedTo", assignedTo);
+      if (taskImage) fd.append("image", taskImage);
+      await API.post("/tasks", fd);
+      setTitle(""); setDescription(""); setStatus("todo"); setPriority("medium");
+      setDueDate(""); setAssignedTo(""); setTaskImage(null); setTaskImagePreview(null);
+      setShowAddForm(false);
+      await refreshTasks();
+      addToast("✅ Task created!"); logActivity(`Created task "${title}"`);
+    } catch { addToast("❌ Failed to create task", "error"); } finally { setIsAdding(false); }
+  };
 
   const handleDeleteTask = async (taskId) => {
     const t = tasks.find(t => t._id === taskId);
@@ -576,7 +471,6 @@ const createTask = async (e) => {
   const userAvatar  = currentUser.avatar || currentUser.profilePic || null;
   const hasActiveFilter = searchQuery || filterUser || filterPriority;
   const unreadCount = notifications.length;
-
 
   return (
     <>
