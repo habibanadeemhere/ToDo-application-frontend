@@ -75,7 +75,7 @@ To contribute to the project, please follow these steps:
 The project is licensed under the MIT License.
 
 ## 📬 Contact
-For any questions or concerns, please contact us at [support@example.com](mailto:support@example.com).
+For any questions or concerns, please contact us at [habibanadeem075@gmail.com](mailto:habibanadeem075@gmail.com).
 
 ## 💖 Thanks Message
-This is written by [readme.ai](https://readme-generator-phi.vercel.app/).
+This is written by [Habiba](https://readme-generator-phi.vercel.app/).
